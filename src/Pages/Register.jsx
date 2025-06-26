@@ -15,10 +15,12 @@ function Register() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError(''); // limpiar error al escribir
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (formData.password !== formData.confirmarPassword) {
       setError('Las contraseñas no coinciden');
       return;
@@ -65,27 +67,62 @@ function Register() {
       <form onSubmit={handleSubmit}>
         <label>
           Nombre:
-          <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} disabled={loading} />
+          <input
+            type="text"
+            name="nombre"
+            value={formData.nombre}
+            onChange={handleChange}
+            disabled={loading}
+            style={{ marginBottom: '0.5rem', width: '100%' }}
+          />
         </label>
         <br />
         <label>
           Apellido:
-          <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} disabled={loading} />
+          <input
+            type="text"
+            name="apellido"
+            value={formData.apellido}
+            onChange={handleChange}
+            disabled={loading}
+            style={{ marginBottom: '0.5rem', width: '100%' }}
+          />
         </label>
         <br />
         <label>
           Email:
-          <input type="email" name="email" value={formData.email} onChange={handleChange} disabled={loading} />
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            disabled={loading}
+            style={{ marginBottom: '0.5rem', width: '100%' }}
+          />
         </label>
         <br />
         <label>
           Contraseña:
-          <input type="password" name="password" value={formData.password} onChange={handleChange} disabled={loading} />
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            disabled={loading}
+            style={{ marginBottom: '0.5rem', width: '100%' }}
+          />
         </label>
         <br />
         <label>
           Confirmar contraseña:
-          <input type="password" name="confirmarPassword" value={formData.confirmarPassword} onChange={handleChange} disabled={loading} />
+          <input
+            type="password"
+            name="confirmarPassword"
+            value={formData.confirmarPassword}
+            onChange={handleChange}
+            disabled={loading}
+            style={{ marginBottom: '0.5rem', width: '100%' }}
+          />
         </label>
         <br />
         <button type="submit" style={{ marginTop: '1rem' }} disabled={loading}>

@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './ProductList.css';
+import { useNavigate } from 'react-router-dom';
 
 const ProductList = () => {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const fetchProductos = async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get('http://localhost:8080/api/products');
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:8080/api/products', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setProductos(res.data);
     } catch (err) {
       setError('Error al cargar productos');
@@ -29,7 +34,10 @@ const ProductList = () => {
     if (!confirmado) return;
 
     try {
-      await axios.delete(`http://localhost:8080/api/products/${id}`);
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:8080/api/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       fetchProductos();
     } catch (err) {
       alert('Error al eliminar el producto');
@@ -50,6 +58,7 @@ const ProductList = () => {
           <thead>
             <tr>
               <th>ID</th>
+              <th>Imagen</th>
               <th>Título</th>
               <th>Acciones</th>
             </tr>
@@ -58,9 +67,25 @@ const ProductList = () => {
             {productos.map((p) => (
               <tr key={p.id}>
                 <td>{p.id}</td>
+                <td>
+                  {p.imageUrl ? (
+                    <img src={p.imageUrl} alt={p.titulo} className="product-thumb" />
+                  ) : (
+                    'Sin imagen'
+                  )}
+                </td>
                 <td>{p.titulo}</td>
                 <td>
-                  <button className="btn-delete" onClick={() => eliminarProducto(p.id)}>
+                  <button
+                    className="btn-edit"
+                    onClick={() => navigate(`/admin/editar/${p.id}`)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="btn-delete"
+                    onClick={() => eliminarProducto(p.id)}
+                  >
                     Eliminar
                   </button>
                 </td>

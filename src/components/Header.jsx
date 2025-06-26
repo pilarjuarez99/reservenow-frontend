@@ -4,7 +4,7 @@ import './Header.css';
 import { AuthContext } from '../context/AuthContext';
 
 const Header = () => {
-  const { user, token, logout } = useContext(AuthContext);
+  const { userEmail, token, role, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -24,7 +24,14 @@ const Header = () => {
       <div className="right-block">
         {token ? (
           <>
-            <span style={{ marginRight: '1rem' }}>Hola, {user?.nombre || 'Usuario'}</span>
+            <span style={{ marginRight: '1rem' }}>Hola, {userEmail || 'Usuario'}</span>
+            
+            {role === 'admin' && (
+              <Link to="/admin" style={{ marginRight: '1rem' }}>
+                <button className="btn-primary">Panel Admin</button>
+              </Link>
+            )}
+
             <button className="btn-outline" onClick={handleLogout}>Cerrar sesión</button>
           </>
         ) : (

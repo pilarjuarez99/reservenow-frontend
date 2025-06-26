@@ -1,11 +1,25 @@
-import { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 
+// Crear contexto
 export const AuthContext = createContext();
 
+// Proveedor de autenticación
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [userEmail, setUserEmail] = useState(localStorage.getItem('userEmail'));
-  const [role, setRole] = useState(localStorage.getItem('role'));
+  const [token, setToken] = useState(() => localStorage.getItem('token') || null);
+  const [userEmail, setUserEmail] = useState(() => localStorage.getItem('userEmail') || null);
+  const [role, setRole] = useState(() => localStorage.getItem('role') || null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simular verificación de token en localStorage o consulta a backend para validar sesión
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+      setUserEmail(localStorage.getItem('userEmail'));
+      setRole(localStorage.getItem('role'));
+    }
+    setLoading(false);
+  }, []);
 
   const login = (token, email, role) => {
     localStorage.setItem('token', token);
@@ -26,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, userEmail, role, login, logout }}>
+    <AuthContext.Provider value={{ token, userEmail, role, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

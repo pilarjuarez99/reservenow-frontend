@@ -16,7 +16,6 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validación simple
     if (!name.trim() || !description.trim() || !imageUrl.trim()) {
       setError('Por favor completa todos los campos');
       setSuccess('');
@@ -24,24 +23,24 @@ const AddProduct = () => {
     }
 
     try {
+      const token = localStorage.getItem('token');
       const response = await axios.post('http://localhost:8080/api/products', {
         name: name.trim(),
         description: description.trim(),
         imageUrl: imageUrl.trim(),
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       if (response.status === 201 || response.status === 200) {
         setSuccess('Producto agregado correctamente');
         setError('');
-        // Limpiar campos
         setName('');
         setDescription('');
         setImageUrl('');
-        // Redirigir a lista
         navigate('/admin/lista');
       }
     } catch (err) {
-      // Manejo de errores con mensajes más claros
       if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else if (err.message) {
@@ -58,9 +57,9 @@ const AddProduct = () => {
       <h2>Agregar Producto</h2>
       <form onSubmit={handleSubmit} className="add-product-form" noValidate>
         <label htmlFor="name">Nombre:</label>
-        <input 
+        <input
           id="name"
-          type="text" 
+          type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Nombre del producto"
@@ -68,7 +67,7 @@ const AddProduct = () => {
         />
 
         <label htmlFor="description">Descripción:</label>
-        <textarea 
+        <textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -77,9 +76,9 @@ const AddProduct = () => {
         />
 
         <label htmlFor="imageUrl">URL de Imagen:</label>
-        <input 
+        <input
           id="imageUrl"
-          type="text" 
+          type="text"
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
           placeholder="URL de la imagen del producto"

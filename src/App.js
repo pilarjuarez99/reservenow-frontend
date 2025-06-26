@@ -14,6 +14,8 @@ import Categoria from './Pages/Categoria';
 import Login from './Pages/Login';
 import Register from './Pages/Register';
 
+import Reserva from './Pages/Reserva'; // <-- Importa Reserva aquí
+
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 
@@ -26,6 +28,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/producto/:id" element={<ProductDetail />} />
+            <Route path="/reserva/:id" element={<Reserva />} />  {/* <-- Ruta Reserva */}
             <Route path="/categoria/:nombre" element={<Categoria />} />
 
             {/* Rutas protegidas solo para admin */}

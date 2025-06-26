@@ -1,29 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import './Home.css';
 
 function Home() {
   const [products, setProducts] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const navigate = useNavigate();
 
+  const isAuthenticated = !!localStorage.getItem("token");
+
   useEffect(() => {
-    // Mostrar recomendaciones aleatorias al cargar la página
     fetch('http://localhost:8080/api/products/random')
       .then(res => res.json())
       .then(data => setProducts(data))
       .catch(error => console.error('Error al cargar productos:', error));
   }, []);
 
-  // Función para buscar productos con el texto del input
   const handleSearch = () => {
-    if (searchText.trim() === '') {
+    if (searchText.trim() === '' && !startDate && !endDate) {
       setSearchResults(null);
       return;
     }
 
-     fetch(`http://localhost:8080/api/products/search?text=${encodeURIComponent(searchText)}`)
+    const queryParams = new URLSearchParams();
+    if (searchText.trim()) queryParams.append('text', searchText);
+    if (startDate) queryParams.append('startDate', startDate.toISOString().split('T')[0]);
+    if (endDate) queryParams.append('endDate', endDate.toISOString().split('T')[0]);
+
+    fetch(`http://localhost:8080/api/products/search?${queryParams}`)
       .then(res => {
         if (!res.ok) throw new Error('Error en la búsqueda');
         return res.json();
@@ -35,26 +46,89 @@ function Home() {
       });
   };
 
-  // Para que al presionar Enter también busque
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
+    if (e.key === 'Enter') handleSearch();
+  };
+
+  const handleFavorite = (productId) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    const updatedFavorites = favorites.includes(productId)
+      ? favorites.filter(id => id !== productId)
+      : [...favorites, productId];
+
+    setFavorites(updatedFavorites);
+    // Aquí iría la lógica para guardar favoritos en el backend si aplica
+  };
+
+  const handleAutocomplete = (e) => {
+    const value = e.target.value;
+    setSearchText(value);
+
+    if (value.length > 2) {
+      fetch(`http://localhost:8080/api/products/autocomplete?text=${encodeURIComponent(value)}`)
+        .then(res => res.json())
+        .then(data => setSearchSuggestions(data))
+        .catch(() => setSearchSuggestions([]));
+    } else {
+      setSearchSuggestions([]);
     }
   };
 
   return (
     <main className="home-main">
-      {/* Buscador */}
+      {/* Bloque Buscador */}
       <section className="buscador">
-        <input
-          type="text"
-          placeholder="Buscar productos..."
-          className="buscador-input"
-          value={searchText}
-          onChange={e => setSearchText(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <button onClick={handleSearch} className="buscador-boton">Buscar</button>
+        <h1 className="buscador-titulo">Buscá tu próxima experiencia</h1>
+        <p className="buscador-descripcion">Filtrá por palabra clave y por rango de fechas</p>
+
+        <div className="buscador-campos">
+          <input
+            type="text"
+            placeholder="Buscar productos..."
+            className="buscador-input"
+            value={searchText}
+            onChange={handleAutocomplete}
+            onKeyDown={handleKeyDown}
+          />
+          {searchSuggestions.length > 0 && (
+            <ul className="sugerencias-autocompletar">
+              {searchSuggestions.map((suggestion, index) => (
+                <li key={index} onClick={() => {
+                  setSearchText(suggestion);
+                  setSearchSuggestions([]);
+                }}>
+                  {suggestion}
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="buscador-fechas">
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              placeholderText="Desde"
+              className="date-picker"
+            />
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              placeholderText="Hasta"
+              className="date-picker"
+            />
+          </div>
+          <button onClick={handleSearch} className="buscador-boton">Realizar búsqueda</button>
+        </div>
       </section>
 
       {/* Categorías */}
@@ -67,7 +141,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Resultados o recomendaciones */}
+      {/* Recomendaciones o Resultados */}
       <section className="recomendaciones">
         <h2>{searchResults !== null ? `Resultados para "${searchText}"` : 'Recomendaciones'}</h2>
         <div className="product-grid">
@@ -80,6 +154,15 @@ function Home() {
                 <Link to={`/producto/${product.id}`} className="ver-mas-link">
                   Ver más
                 </Link>
+
+                {isAuthenticated && (
+                  <button
+                    className={`fav-button ${favorites.includes(product.id) ? 'activo' : ''}`}
+                    onClick={() => handleFavorite(product.id)}
+                  >
+                    {favorites.includes(product.id) ? '★ Favorito' : '☆ Marcar favorito'}
+                  </button>
+                )}
               </div>
             ))
           ) : (
