@@ -1,0 +1,61 @@
+.productlist-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.productlist-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.productlist-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.productlist-table thead tr {
+  background-color: #007bff;
+  color: white;
+}
+
+.productlist-table thead th {
+  padding: 12px;
+  text-align: left;
+}
+
+.productlist-table tbody tr {
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.productlist-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.productlist-table tbody td {
+  padding: 12px;
+}
+
+.btn-delete {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn-delete:hover {
+  background-color: #c9302c;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-bottom: 10px;
+}

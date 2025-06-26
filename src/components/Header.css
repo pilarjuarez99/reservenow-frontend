@@ -1,0 +1,73 @@
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #004080; /* Azul corporativo oscuro */
+  color: white;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+}
+
+.left-block {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.logo {
+  height: 50px;
+  width: auto;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.brand p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #cce6ff;
+}
+
+.right-block {
+  display: flex;
+  gap: 10px;
+}
+
+.right-block button {
+  background-color: white;
+  color: #004080;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.right-block button:hover {
+  background-color: #cce0ff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .right-block {
+    margin-top: 10px;
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

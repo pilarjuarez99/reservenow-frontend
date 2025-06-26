@@ -1,0 +1,43 @@
+.admin-container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 40px auto; /* un poco de margen arriba */
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.admin-no-mobile {
+  padding: 20px;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #cc0000; /* un rojo más visible para el mensaje */
+  font-weight: 600;
+}
+
+.admin-nav ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  gap: 25px; /* espacio horizontal entre enlaces */
+}
+
+.admin-nav li {
+  margin-bottom: 0; /* sin margen porque usamos flex */
+}
+
+.admin-nav a {
+  text-decoration: none;
+  color: white;
+  background-color: #007BFF;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+}
+
+.admin-nav a:hover {
+  background-color: #0056b3;
+  color: white;
+}
