@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simular verificación de token en localStorage o consulta a backend para validar sesión
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
@@ -21,13 +20,13 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (token, email, role) => {
-    localStorage.setItem('token', token);
+  const login = (newToken, email, newRole) => {
+    localStorage.setItem('token', newToken);
     localStorage.setItem('userEmail', email);
-    localStorage.setItem('role', role);
-    setToken(token);
+    localStorage.setItem('role', newRole);
+    setToken(newToken);
     setUserEmail(email);
-    setRole(role);
+    setRole(newRole);
   };
 
   const logout = () => {

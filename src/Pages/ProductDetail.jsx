@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
@@ -6,22 +6,27 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './ProductDetail.css';
 import { FaStar } from 'react-icons/fa';
 import { FacebookShareButton, TwitterShareButton } from 'react-share';
+import { AuthContext } from '../context/AuthContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const [disabledDates, setDisabledDates] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [showShare, setShowShare] = useState(false);
+
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [reviews, setReviews] = useState([]);
 
-  const isAuthenticated = localStorage.getItem('authToken') !== null;
+  const isAuthenticated = !!token;
 
   useEffect(() => {
     // Traer producto
@@ -35,14 +40,14 @@ const ProductDetail = () => {
         setLoading(false);
       });
 
-    // Simulación: fechas reservadas
+    // Simulación: fechas reservadas (deberías obtenerlas del backend)
     setDisabledDates([
       new Date('2025-07-10'),
       new Date('2025-07-11'),
       new Date('2025-07-12'),
     ]);
 
-    // Simulación: traer reseñas
+    // Simulación: traer reseñas (deberías obtenerlas del backend)
     setReviews([
       { user: 'Lucía', stars: 4, date: '2025-06-01', comment: 'Muy buen producto' },
       { user: 'Pedro', stars: 5, date: '2025-06-20', comment: 'Lo disfrutamos mucho' },
@@ -51,6 +56,9 @@ const ProductDetail = () => {
 
   const handleRatingSubmit = () => {
     if (!rating) return;
+
+    // Aquí podrías hacer un POST al backend para guardar la reseña
+
     const newReview = {
       user: 'Tú',
       stars: rating,
@@ -156,7 +164,7 @@ const ProductDetail = () => {
           />
         </section>
 
-        {/* Puntuar */}
+        {/* Puntuar (solo usuarios logueados) */}
         {isAuthenticated && (
           <section className="valoracion">
             <h3>Tu reseña</h3>
