@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';  // <-- Importá Link
 import '../Pages/Home.css';
 
 function Categoria() {
@@ -31,6 +31,11 @@ function Categoria() {
               <img src={product.imagenUrl} alt={product.titulo} />
               <h3>{product.titulo}</h3>
               <p>{product.descripcion}</p>
+
+              {/* Aquí el botón Ver más */}
+              <Link to={`/producto/${product.id}`} className="ver-mas-link">
+                Ver más
+              </Link>
             </div>
           ))
         ) : (

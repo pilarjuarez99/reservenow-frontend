@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './Home.css';
@@ -13,9 +13,11 @@ function Home() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const isAuthenticated = !!localStorage.getItem("token");
 
+  // Obtener productos aleatorios
   useEffect(() => {
     fetch('http://localhost:8080/api/products/random')
       .then(res => res.json())
@@ -23,6 +25,18 @@ function Home() {
       .catch(error => console.error('Error al cargar productos:', error));
   }, []);
 
+  // Detectar categoría en la URL y aplicar filtro
+  const categoriaSeleccionada = location.pathname.startsWith('/categoria/')
+    ? decodeURIComponent(location.pathname.split('/categoria/')[1]).toLowerCase()
+    : null;
+
+  const productosAMostrar = searchResults !== null
+    ? searchResults
+    : categoriaSeleccionada
+      ? products.filter(p => p.categoria?.toLowerCase() === categoriaSeleccionada)
+      : products;
+
+  // Búsqueda por texto y fechas
   const handleSearch = () => {
     if (searchText.trim() === '' && !startDate && !endDate) {
       setSearchResults(null);
@@ -143,10 +157,17 @@ function Home() {
 
       {/* Recomendaciones o Resultados */}
       <section className="recomendaciones">
-        <h2>{searchResults !== null ? `Resultados para "${searchText}"` : 'Recomendaciones'}</h2>
+        <h2>
+          {searchResults !== null
+            ? `Resultados para "${searchText}"`
+            : categoriaSeleccionada
+              ? `Filtrado por categoría: ${categoriaSeleccionada.charAt(0).toUpperCase() + categoriaSeleccionada.slice(1)}`
+              : 'Recomendaciones'}
+        </h2>
+
         <div className="product-grid">
-          {(searchResults !== null ? searchResults : products).length > 0 ? (
-            (searchResults !== null ? searchResults : products).map(product => (
+          {productosAMostrar.length > 0 ? (
+            productosAMostrar.map(product => (
               <div key={product.id} className="product-card">
                 <img src={product.imagenUrl} alt={product.titulo} />
                 <h3>{product.titulo}</h3>

@@ -14,18 +14,18 @@ const Header = () => {
 
   return (
     <header className="main-header">
-      <div className="left-block">
+      <Link to="/" className="left-block" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
         <img src="/logo.png" alt="Logo ReservaNow" className="logo" />
-        <div className="brand">
+        <div className="brand" style={{ marginLeft: '0.5rem' }}>
           <h1>ReservaNow</h1>
           <p>Tu lugar ideal, en un clic</p>
         </div>
-      </div>
+      </Link>
       <div className="right-block">
         {token ? (
           <>
             <span style={{ marginRight: '1rem' }}>Hola, {userEmail || 'Usuario'}</span>
-            
+
             {role === 'admin' && (
               <Link to="/admin" style={{ marginRight: '1rem' }}>
                 <button className="btn-primary">Panel Admin</button>

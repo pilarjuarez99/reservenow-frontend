@@ -8,6 +8,51 @@ import { FaStar } from 'react-icons/fa';
 import { FacebookShareButton, TwitterShareButton } from 'react-share';
 import { AuthContext } from '../context/AuthContext';
 
+const ImageCarousel = ({ images }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const prevImage = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
+
+  const nextImage = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  if (!images || images.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="gallery-container">
+      <button className="arrow arrow-left" onClick={prevImage} aria-label="Anterior">
+        ‹
+      </button>
+      <div
+        className="gallery"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {images.map((url, idx) => (
+          <img
+            key={idx}
+            src={url}
+            alt={`Imagen ${idx + 1}`}
+            className="gallery-image"
+            draggable={false}
+          />
+        ))}
+      </div>
+      <button className="arrow arrow-right" onClick={nextImage} aria-label="Siguiente">
+        ›
+      </button>
+    </div>
+  );
+};
+
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,16 +74,20 @@ const ProductDetail = () => {
   const isAuthenticated = !!token;
 
   useEffect(() => {
-    // Traer producto
-    axios.get(`http://localhost:8080/api/products/${id}`)
-      .then(response => {
+    console.log("ID producto:", id);
+    const fetchProduct = async () => {
+      try {
+        const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+        const response = await axios.get(`http://localhost:8080/api/products/${id}`, config);
         setProduct(response.data);
         setLoading(false);
-      })
-      .catch(() => {
+      } catch (error) {
         setError('Error al cargar el producto');
         setLoading(false);
-      });
+      }
+    };
+
+    fetchProduct();
 
     // Simulación: fechas reservadas (deberías obtenerlas del backend)
     setDisabledDates([
@@ -52,7 +101,7 @@ const ProductDetail = () => {
       { user: 'Lucía', stars: 4, date: '2025-06-01', comment: 'Muy buen producto' },
       { user: 'Pedro', stars: 5, date: '2025-06-20', comment: 'Lo disfrutamos mucho' },
     ]);
-  }, [id]);
+  }, [id, token]);
 
   const handleRatingSubmit = () => {
     if (!rating) return;
@@ -77,13 +126,20 @@ const ProductDetail = () => {
   return (
     <div className="product-detail">
       <header className="detail-header">
-        <h2>{product.name}</h2>
+        <h2>{product.titulo}</h2>
         <button onClick={() => navigate(-1)}>← Volver</button>
       </header>
 
       <section className="detail-body">
-        <img src={product.imageUrl} alt={product.name} className="detail-image" />
-        <p>{product.description}</p>
+        {product.imagenes && product.imagenes.length > 0 ? (
+          <ImageCarousel images={[...product.imagenes]} />
+        ) : (
+          <div className="image-container">
+            <img src={product.imagenUrl} alt={product.titulo} className="detail-image" />
+          </div>
+        )}
+
+        <p>{product.descripcion}</p>
 
         <button
           onClick={() => navigate(`/reserva/${product.id}`)}
@@ -141,8 +197,8 @@ const ProductDetail = () => {
           {showShare && (
             <div className="modal">
               <h4>Compartir este producto</h4>
-              <img src={product.imageUrl} alt="mini" />
-              <p>{product.description}</p>
+              <img src={product.imagenUrl} alt="mini" />
+              <p>{product.descripcion}</p>
               <FacebookShareButton url={window.location.href}><button>Facebook</button></FacebookShareButton>
               <TwitterShareButton url={window.location.href}><button>Twitter</button></TwitterShareButton>
               <button onClick={() => setShowShare(false)}>Cerrar</button>
@@ -155,7 +211,7 @@ const ProductDetail = () => {
           <h3>Ubicación</h3>
           <iframe
             title="mapa"
-            src="https://www.google.com/maps?q=Charcas+%26+Thames,+Buenos+Aires&output=embed"
+            src={`https://www.google.com/maps?q=${encodeURIComponent(product.ubicacion)}&output=embed`}
             width="100%"
             height="300"
             style={{ border: 0, borderRadius: '10px' }}

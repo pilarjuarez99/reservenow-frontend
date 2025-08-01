@@ -1,33 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './Reserva.css';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 
 const Reserva = () => {
   const { id } = useParams(); // ID del producto a reservar
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
+
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [people, setPeople] = useState(1);
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage('');
 
-    if (!startDate || !endDate || people < 1) {
+    // Validaciones básicas
+    if (!startDate || !endDate) {
       setMessage('Por favor completa todos los campos correctamente.');
       return;
     }
 
+    if (!token) {
+      setMessage('Debes iniciar sesión para realizar una reserva.');
+      return;
+    }
+
     try {
-      const response = await axios.post('http://localhost:8080/api/reservations', {
-        productId: id,
-        startDate,
-        endDate,
-        people,
-      });
+      const reservaPayload = {
+        product: { id: parseInt(id) },
+        fechaInicio: startDate.toISOString(),
+        fechaFin: endDate.toISOString(),
+      };
+
+      const response = await axios.post(
+        'http://localhost:8080/reservas',
+        reservaPayload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.status === 201 || response.status === 200) {
         setMessage('Reserva confirmada con éxito!');
@@ -36,7 +55,11 @@ const Reserva = () => {
         setMessage('Error al confirmar la reserva.');
       }
     } catch (error) {
-      setMessage('Ocurrió un error al enviar la reserva.');
+      if (error.response) {
+        setMessage(`Error: ${error.response.data || 'No se pudo procesar la reserva.'}`);
+      } else {
+        setMessage('Ocurrió un error al enviar la reserva.');
+      }
       console.error(error);
     }
   };
@@ -65,14 +88,6 @@ const Reserva = () => {
           endDate={endDate}
           minDate={startDate || new Date()}
           placeholderText="Selecciona la fecha de fin"
-        />
-
-        <label>Cantidad de personas:</label>
-        <input
-          type="number"
-          value={people}
-          min="1"
-          onChange={(e) => setPeople(parseInt(e.target.value))}
         />
 
         <button type="submit">Confirmar reserva</button>
